@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { userModel } from "../models/user.model.js";
 import dotenv, { decrypt } from "dotenv";
+import transporter from "../config/nodemailer.js";
+import { getRegisterEmail } from "../utils/email.config.js";
 
 dotenv.config();
 
@@ -23,12 +25,18 @@ export const register = async (req, res) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
       });
-      res.cookie("token", token, {
+
+      await transporter.sendMail(
+        getRegisterEmail(process.env.SMTP_USER, user.email)
+      );
+
+      res.cookie("access_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "prod" ? true : false,
         sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // to convert into milli seconds
       });
+
       return res
         .status(200)
         .json({ success: true, message: "User Registeration successful" });
@@ -77,7 +85,7 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("access_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "prod" ? true : false,
       sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
@@ -90,3 +98,4 @@ export const logout = async (req, res) => {
     });
   }
 };
+
