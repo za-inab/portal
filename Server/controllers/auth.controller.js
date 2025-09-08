@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { userModel } from "../models/user.model.js";
 import dotenv, { decrypt } from "dotenv";
 import transporter from "../config/nodemailer.js";
-import { getRegisterEmail } from "../utils/email.config.js";
+import { getOtpEmail, getRegisterEmail } from "../utils/email.config.js";
 
 dotenv.config();
 
@@ -96,6 +96,26 @@ export const logout = async (req, res) => {
       success: false,
       message: "Email and Password are required",
     });
+  }
+};
+
+export const sendVerifyOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = userModel.findOne({ email });
+    if (user.isAccountVerified)
+      return res
+        .status(200)
+        .json({ success: false, message: "Account is already verified" });
+    const otp = Math.floor(Math.random(10) * 700000);
+
+    user.verifyOtp = otp;
+    user.verifyOtpExpireAt = Date.now() + 1 * 60 * 60 * 1000;
+    await user.save();
+
+    await transporter.sendMail(getOtpEmail(process.env.SMTP_USER, email, otp));
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

@@ -11,3 +11,12 @@ export const getRegisterEmail=(sender,receiver)=>{
     }
     
   }
+
+  export const getOtpEmail = (sender, receiver, Otp) => {
+    return {
+      from: sender,
+      to: receiver,
+      subject: "Verify Email",
+      text: `Please enter the following OTP for verification of your email\n ${Otp}`,
+    };
+  };
