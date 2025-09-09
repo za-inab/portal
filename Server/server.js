@@ -17,7 +17,12 @@ const uri = process.env.DB_URI.replace("USERNAME", process.env.DB_USER).replace(
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ credentials: true }));
+app.use(
+  cors({
+    //origin: process.env.CLIENT_URL, // e.g., "http://localhost:3000"
+    credentials: true,
+  })
+);
 
 //API Endpoints
 app.get("/", (req, res) => {
@@ -25,8 +30,7 @@ app.get("/", (req, res) => {
 });
 app.use("/api/auth", authRouter);
 
-
-app.listen(PORT,()=>{
-    connectDB(uri);
-    console.log('server listening on port ',PORT)
-})
+app.listen(PORT, () => {
+  connectDB(uri);
+  console.log("server listening on port ", PORT);
+});

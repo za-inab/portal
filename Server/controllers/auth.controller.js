@@ -102,7 +102,7 @@ export const logout = async (req, res) => {
 export const sendVerifyOtp = async (req, res) => {
   try {
     const { userId } = req.body;
-    const user = userModel.findOne({ userId });
+    const user = await userModel.findOne({ _id: userId });
     if (user.isAccountVerified)
       return res
         .status(200)
@@ -113,7 +113,9 @@ export const sendVerifyOtp = async (req, res) => {
     user.verifyOtpExpireAt = Date.now() + 1 * 60 * 60 * 1000;
     await user.save();
 
-    await transporter.sendMail(getOtpEmail(process.env.SMTP_USER, email, otp));
+    await transporter.sendMail(
+      getOtpEmail(process.env.SMTP_USER, user.email, otp)
+    );
 
     return res
       .status(200)
@@ -122,26 +124,33 @@ export const sendVerifyOtp = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
- 
+
 export const verifyEmail = async (req, res) => {
   const { userId, otp } = req.body;
   if (!userId || !otp)
     return res.status(300).json({ success: false, message: "Missing Details" });
 
-  const user = userModel.findOne({ userId });
+  try {
+    const user = await userModel.findOne({ _id: userId });
 
-  if (user.verifyOtpExpireAt < Date.now())
-    return res.status(300).json({ success: false, message: "OTP expired" });
+    if (user.verifyOtpExpireAt < Date.now())
+      return res.status(300).json({ success: false, message: "OTP expired" });
 
-  if (user.otp !== otp)
-    return res.status(500).json({ success: false, message: "Incorrect OTP." });
+    if (user.verifyOtp !== otp)
+      return res
+        .status(500)
+        .json({ success: false, message: "Incorrect OTP." });
 
-  user.isAccountVerified = true;
-  user.verifyOtp = "";
-  user.verifyOtpExpireAt = 0;
-  await user.save();
-  return res.status(200).json({
-    success: true,
-    message: "Email verified successfully. You account is verified.",
-  });
+    user.isAccountVerified = true;
+    user.verifyOtp = "";
+
+    user.verifyOtpExpireAt = 0;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully. You account is verified.",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
 };
