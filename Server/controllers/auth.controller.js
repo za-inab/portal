@@ -3,7 +3,12 @@ import jwt from "jsonwebtoken";
 import { userModel } from "../models/user.model.js";
 import dotenv, { decrypt } from "dotenv";
 import transporter from "../config/nodemailer.js";
-import { getOtpEmail, getRegisterEmail } from "../utils/email.config.js";
+import {
+  getOtpEmail,
+  getPasswordOtpEmail,
+  getRegisterEmail,
+} from "../utils/email.config.js";
+import { getOtp } from "../utils/utilities.js";
 
 dotenv.config();
 
@@ -107,7 +112,7 @@ export const sendVerifyOtp = async (req, res) => {
       return res
         .status(200)
         .json({ success: false, message: "Account is already verified" });
-    const otp = Math.floor(Math.random(10) * 700000);
+    const otp = getOtp();
 
     user.verifyOtp = otp;
     user.verifyOtpExpireAt = Date.now() + 1 * 60 * 60 * 1000;
@@ -155,10 +160,88 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-
 export const isAuthenticated = async (req, res) => {
   try {
     return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const sendPassResetOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email)
+      return res
+        .status(400)
+        .json({ success: true, message: "Please enter email" });
+    const user = await userModel.findOne({ email });
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found" });
+
+    const otp = getOtp();
+
+    user.resetOtp = otp;
+    user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000;
+
+    user.save();
+
+    await transporter.sendMail(getPasswordOtpEmail(email, otp));
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset Otp has been sent by email",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
+    if (!email || !otp || !password) {
+      return res
+        .status(400)
+        .json({ success: true, message: "Missing Information" });
+    }
+
+    const user = await userModel.findOne({ email });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Email not found" });
+
+    if (user.resetOtpExpireAt < Date.now())
+      return res.status(300).json({ success: false, message: "OTP expired" });
+
+    if (user.resetOtp !== otp)
+      return res
+        .status(500)
+        .json({ success: false, message: "Incorrect OTP." });
+
+    user.password = await bcrypt.hash(password, 10);
+    user.resetOtp = "";
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    await user.save();
+    return res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "prod" ? true : false,
+        sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // to convert into milli seconds
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Password Successfully changed",
+      });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
