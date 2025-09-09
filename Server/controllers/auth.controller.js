@@ -101,8 +101,8 @@ export const logout = async (req, res) => {
 
 export const sendVerifyOtp = async (req, res) => {
   try {
-    const { email } = req.body;
-    const user = userModel.findOne({ email });
+    const { userId } = req.body;
+    const user = userModel.findOne({ userId });
     if (user.isAccountVerified)
       return res
         .status(200)
@@ -124,11 +124,11 @@ export const sendVerifyOtp = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-  const { email, otp } = req.body;
-  if (!email || !otp)
+  const { userId, otp } = req.body;
+  if (!userId || !otp)
     return res.status(300).json({ success: false, message: "Missing Details" });
 
-  const user = userModel.findOne({ email });
+  const user = userModel.findOne({ userId });
 
   if (user.verifyOtpExpireAt < Date.now())
     return res.status(300).json({ success: false, message: "OTP expired" });
