@@ -7,6 +7,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
 
 function Router() {
+    console.log("path", document.URL);
   return (
     <div>
       <Routes>

@@ -1,9 +1,10 @@
 import "./App.css";
+import Router from "./Router";
 
 function App() {
   return (
     <>
-      <h1 className="text-emerald-300">Hello world</h1>
+      <Router />
     </>
   );
 }
