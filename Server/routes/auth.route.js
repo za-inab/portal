@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  isAuthenticated,
   login,
   logout,
   register,
@@ -15,5 +16,7 @@ authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 authRouter.post("/send-verify-otp", userAuth, sendVerifyOtp);
 authRouter.post("/verify-email", userAuth, verifyEmail);
+authRouter.post("/is-auth", userAuth, isAuthenticated);
+
 
 
