@@ -127,16 +127,21 @@ export const verifyEmail = async (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp)
     return res.status(300).json({ success: false, message: "Missing Details" });
+
   const user = userModel.findOne({ email });
+
+  if (user.verifyOtpExpireAt < Date.now())
+    return res.status(300).json({ success: false, message: "OTP expired" });
+
   if (user.otp !== otp)
     return res.status(500).json({ success: false, message: "Incorrect OTP." });
 
   user.isAccountVerified = true;
+  user.verifyOtp = "";
+  user.verifyOtpExpireAt = 0;
   await user.save();
-  return res
-    .status(200)
-    .json({
-      success: true,
-      message: "Email verified successfully. You account is verified.",
-    });
+  return res.status(200).json({
+    success: true,
+    message: "Email verified successfully. You account is verified.",
+  });
 };
