@@ -114,8 +114,29 @@ export const sendVerifyOtp = async (req, res) => {
     await user.save();
 
     await transporter.sendMail(getOtpEmail(process.env.SMTP_USER, email, otp));
+
+    return res
+      .status(200)
+      .json({ success: true, message: "OTP sent on email" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
+export const verifyEmail = async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp)
+    return res.status(300).json({ success: false, message: "Missing Details" });
+  const user = userModel.findOne({ email });
+  if (user.otp !== otp)
+    return res.status(500).json({ success: false, message: "Incorrect OTP." });
+
+  user.isAccountVerified = true;
+  await user.save();
+  return res
+    .status(200)
+    .json({
+      success: true,
+      message: "Email verified successfully. You account is verified.",
+    });
+};
