@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 function Navbar() {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-row w-full  justify-between items-center p-4 sm:p-6 sm:px-10 absolute top-0">
+    <div className="flex flex-row w-full  justify-between items-center px-4 sm:px-10 absolute top-0">
       <img
         src={assets.logo}
         className="aspect-square max-w-[80px]"
