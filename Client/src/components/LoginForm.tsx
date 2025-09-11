@@ -116,7 +116,11 @@ function LoginForm() {
               placeholder="Enter your password"
             />
           </div>
-          <p className="mb-4 text-amber-300 cursor-pointer">Forgot password?</p>
+          {!(page === "Sign-up") && (
+            <p className="mb-4 text-amber-300 cursor-pointer">
+              Forgot password?
+            </p>
+          )}
           <button
             className="w-full py-2.5 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-amber-700 transition-all font-semibold"
             onClick={() => submitHandler()}
