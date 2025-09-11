@@ -1,10 +1,17 @@
-import React, { useState } from "react";
-import { assets } from "../assets/assets";
-import { Button, Checkbox, Form, Input } from "antd";
+import React, { useContext, useState } from "react";
+import { toast } from "react-toastify";
+
+import { AppContext } from "../context/AppContext";
+import { login, register } from "../utilities/nextworkRequest";
+import { useNavigate } from "react-router-dom";
+import { notification } from "antd";
 
 // type Props = {}
 // props: Props
 function LoginForm() {
+  const navigate = useNavigate();
+  const { setIsLoggedIn, getUserData } = useContext(AppContext);
+
   const [page, setPage] = useState("Sign-up");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,14 +26,37 @@ function LoginForm() {
     handlers[stateName](value);
   };
 
-  const submitHandler = () => {
-    const fName = name;
-    const femail = email;
-    const fPassword = password;
-    changeHandler("name", "");
-    changeHandler("email", "");
-    changeHandler("password", "");
-    console.log("name email pass", fName, femail, fPassword);
+  const onSubmitHandler = async (e) => {
+    try {
+      e.preventDefault();
+      const fName = name;
+      const femail = email;
+      const fPassword = password;
+
+      if (page === "Sign-up") {
+        const { data } = await register(fName, femail, fPassword);
+        if (data.success) {
+          setIsLoggedIn(true);
+          getUserData();
+          navigate("/");
+        } else {
+          toast.error(data.message);
+        }
+      } else {
+        const { data } = await login(femail, fPassword);
+        if (data.success) {
+          setIsLoggedIn(true);
+          getUserData();
+          navigate("/");
+        } else {
+          toast.error(data.message);
+        }
+      }
+
+      changeHandler("name", "");
+      changeHandler("email", "");
+      changeHandler("password", "");
+    } catch (error) {}
   };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6  ">
@@ -39,7 +69,7 @@ function LoginForm() {
             ? "Create Your Account"
             : "Login to your account!"}
         </p>
-        <form className="my-2.5">
+        <form className="my-2.5" onSubmit={onSubmitHandler}>
           {page === "Sign-up" && (
             <div className="mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-amber-600">
               <svg
@@ -117,13 +147,16 @@ function LoginForm() {
             />
           </div>
           {!(page === "Sign-up") && (
-            <p className="mb-4 text-amber-300 cursor-pointer">
+            <p
+              className="mb-4 text-amber-300 cursor-pointer"
+              onClick={() => navigate("/reset-password")}
+            >
               Forgot password?
             </p>
           )}
           <button
+            type="submit"
             className="w-full py-2.5 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-amber-700 transition-all font-semibold"
-            onClick={() => submitHandler()}
           >
             {page === "Sign-up" ? "Sign Up" : "Login"}{" "}
           </button>

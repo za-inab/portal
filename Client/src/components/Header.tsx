@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
 
 type HeaderProps = {
   name?: string;
@@ -7,15 +8,18 @@ type HeaderProps = {
 
 export default function Header(props: HeaderProps) {
   const { name = "Developer" } = props;
+
+  const { userData } = useContext(AppContext);
+
   return (
-    <div className="flex flex-col items-center mt-20 px-4 text-center">
+    <div className="flex flex-col items-center mt-20 px-4 text-center text-amber-900">
       <img
         src={assets.header_img}
         alt={"Welcome image"}
         className="w-36 h-36 rounded-full mb-6"
       />
       <h1 className="flex flex-row items-center gap-2 text-xl sm:text-3xl font-medium mb-2">
-        Hi, {name}
+        Hi, {userData ? userData.name : name}
         <img
           src={assets.hand_wave}
           alt="hand wave"
@@ -29,7 +33,7 @@ export default function Header(props: HeaderProps) {
         Let's start with a quick product tour and we will have you up and
         running in no time
       </p>
-      <button className="border-2 text-amber-700 border-amber-400 rounded-full px-8 py-2.5 hover:bg-amber-300 transition-all">
+      <button className="border-2 text-amber-700 border-amber-700 rounded-full px-8 py-2.5 hover:bg-amber-700 hover:text-amber-200 transition-all">
         Get Started
       </button>
     </div>
