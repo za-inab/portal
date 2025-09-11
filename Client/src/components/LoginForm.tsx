@@ -6,8 +6,28 @@ import { Button, Checkbox, Form, Input } from "antd";
 // props: Props
 function LoginForm() {
   const [page, setPage] = useState("Sign-up");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const changeHandler = () => {};
+  const changeHandler = (stateName: string, value: string) => {
+    const handlers = {
+      name: setName,
+      email: setEmail,
+      password: setPassword,
+    };
+    handlers[stateName](value);
+  };
+
+  const submitHandler = () => {
+    const fName = name;
+    const femail = email;
+    const fPassword = password;
+    changeHandler("name", "");
+    changeHandler("email", "");
+    changeHandler("password", "");
+    console.log("name email pass", fName, femail, fPassword);
+  };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6  ">
       <div className="bg-amber-700 p-10 rounded-lg shadow-lg shadow-amber-900 w-full sm:w-96 text-amber-200 text-sm">
@@ -40,7 +60,8 @@ function LoginForm() {
               <input
                 className="bg-transparent outline-none text-amber-200"
                 name="name"
-                onChange={changeHandler}
+                value={name}
+                onChange={(e) => changeHandler("name", e.target.value)}
                 placeholder="Enter your full name"
               />
             </div>
@@ -65,7 +86,8 @@ function LoginForm() {
             <input
               className="bg-transparent outline-none text-amber-200"
               name="email"
-              onChange={changeHandler}
+              value={email}
+              onChange={(e) => changeHandler("email", e.target.value)}
               placeholder="Enter your email"
             />
           </div>
@@ -89,12 +111,16 @@ function LoginForm() {
             <input
               className="bg-transparent outline-none text-amber-200"
               name="password"
-              onChange={changeHandler}
+              value={password}
+              onChange={(e) => changeHandler("password", e.target.value)}
               placeholder="Enter your password"
             />
           </div>
           <p className="mb-4 text-amber-300 cursor-pointer">Forgot password?</p>
-          <button className="w-full py-2.5 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-amber-700 transition-all font-semibold">
+          <button
+            className="w-full py-2.5 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-amber-700 transition-all font-semibold"
+            onClick={() => submitHandler()}
+          >
             {page === "Sign-up" ? "Sign Up" : "Login"}{" "}
           </button>
         </form>
@@ -103,7 +129,7 @@ function LoginForm() {
             ? "Already have an accound ?"
             : "Don't have an account"}{" "}
           <span
-            className="underline hover:cursor-pointer hover:text-amber-50"
+            className="underline hover:cursor-pointer hover:text-amber-50 text-amber-200"
             onClick={() => {
               setPage(page === "Sign-up" ? "Login" : "Sign-up");
             }}
