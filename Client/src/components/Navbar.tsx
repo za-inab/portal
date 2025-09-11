@@ -7,11 +7,17 @@ import axios from "axios";
 
 function Navbar() {
   const navigate = useNavigate();
+  const beUrl = import.meta.env.VITE_BASE_URL;
   const { userData, setUserData, setIsLoggedIn } = useContext(AppContext);
 
-  const verifyEmail = () => {
+  const verifyEmail = async () => {
     try {
       axios.defaults.withCredentials = true;
+      const { data } = await axios.post(`${beUrl}/api/auth/send-verify-otp`);
+      if (data.success) {
+        navigate("/verify-email");
+        toast.success(data.message);
+      } else toast.error(data.message);
     } catch (error) {
       toast.error(error.message);
     }
@@ -19,9 +25,7 @@ function Navbar() {
   const logout = async () => {
     try {
       axios.defaults.withCredentials = true;
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/api/auth/logout`
-      );
+      const { data } = await axios.post(`${beUrl}/api/auth/logout`);
       if (data.success) {
         setIsLoggedIn(false);
         setUserData(false);
