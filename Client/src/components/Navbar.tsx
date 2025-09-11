@@ -13,7 +13,7 @@ function Navbar() {
         onClick={() => navigate("/")}
       />
       <button
-        className="flex items-center gap-2 border-2 border-amber-300 bg-amber-200 rounded-[30px] p-4 text-amber-700 hover:bg-amber-300"
+        className="flex items-center gap-2 border-2 border-amber-700 bg-amber-200 rounded-full px-5 py-3 text-amber-700 hover:bg-amber-700 hover:text-amber-200"
         onClick={() => navigate("/login")}
       >
         Login
