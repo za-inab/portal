@@ -48,15 +48,18 @@ function Navbar() {
         <div className="w-8 h-8 flex justify-center items-center rounded-full bg-amber-950 text-amber-50 relative group">
           {userData.name[0].toUpperCase()}
           <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-amber-100 rounded-2xl pt-10">
-            <ul className="list-none m-0 p-2 bg-amber-900 text-sm rounded-sm">
-              {!userData.isAccountVerified && (
-                <li
-                  className="px-2 py-1 hover:bg-amber-200 hover:text-amber-900 rounded-sm"
-                  onClick={() => verifyEmail()}
-                >
-                  Verify Email
-                </li>
-              )}
+            <ul className="list-none m-0 p-2 bg-amber-900 text-sm rounded-sm w-max">
+              <li
+                className={`px-2 py-1 hover:bg-amber-200 hover:text-amber-900 rounded-sm  ${
+                  userData.isAccountVerified ? "pointer-events-none " : ""
+                }`}
+                onClick={() => verifyEmail()}
+              >
+                {userData.isAccountVerified
+                  ? "Email is Verified"
+                  : "Verify Email"}
+              </li>
+
               <li
                 className="px-2 py-1 hover:bg-amber-200 hover:text-amber-900 pr-10 rounded-sm"
                 onClick={() => logout()}
