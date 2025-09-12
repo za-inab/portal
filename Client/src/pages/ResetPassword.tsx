@@ -114,6 +114,7 @@ function ResetPassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter New password"
+                  type={"password"}
                   className="outline-none"
                   required={otpSent}
                 />
@@ -141,6 +142,7 @@ function ResetPassword() {
                 <input
                   name="email"
                   value={email}
+                  type={"email"}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   className="outline-none"
