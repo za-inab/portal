@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import {
   EMAIL_VERIFY_TEMPLATE,
   PASSWORD_RESET_TEMPLATE,
-} from "Server/config/emailTemplates";
+} from "./../config/emailTemplates.js";
 
 dotenv.config();
 
