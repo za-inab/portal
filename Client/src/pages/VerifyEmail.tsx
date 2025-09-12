@@ -8,7 +8,7 @@ import { AppContext } from "../context/AppContext";
 function VerifyEmail() {
   const inputRefs = React.useRef([]);
   const navigate = useNavigate();
-  const { userData, isLoggedIn } = useContext(AppContext);
+  const { userData, isLoggedIn, getUserData } = useContext(AppContext);
   console.log("userData: ", userData);
 
   const handleInput = (e, index) => {
@@ -40,6 +40,7 @@ function VerifyEmail() {
       const { data } = await submitEmailVerifyOtp(otp);
       if (data.success) {
         toast.success(data.message);
+        getUserData();
         navigate("/");
       } else toast.error(data.message);
     } catch (error) {

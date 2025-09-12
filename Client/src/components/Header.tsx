@@ -9,14 +9,7 @@ type HeaderProps = {
 export default function Header(props: HeaderProps) {
   const { name = "Developer" } = props;
 
-  const { userData, getAuthState } = useContext(AppContext);
-
-  useEffect(() => {
-    const getData = async () => {
-      await getAuthState();
-    };
-    getData();
-  }, []);
+  const { userData } = useContext(AppContext);
 
   return (
     <div className="flex flex-col items-center mt-20 px-4 text-center text-amber-900">
