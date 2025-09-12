@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
-
+const allowedOrigins = "http://localhost:5173";
 const uri = process.env.DB_URI.replace("USERNAME", process.env.DB_USER).replace(
   "PASSWORD",
   process.env.DB_PASSWORD
@@ -21,7 +21,10 @@ app.use(cookieParser());
 app.use(
   cors({
     //origin: process.env.CLIENT_URL, // e.g., "http://localhost:3000"
+    origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "POST"],
+    allowedHeaders: "Content-Type,Authorization",
   })
 );
 
