@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
-import Password from "antd/es/input/Password";
-import axios from "axios";
-import { getResetPasswordOtp } from "../utilities/nextworkRequest";
+import {
+  getResetPasswordOtp,
+  resetPassword,
+} from "../utilities/nextworkRequest";
 
 function ResetPassword() {
   const inputRefs = React.useRef([]);
@@ -40,30 +41,24 @@ function ResetPassword() {
       if (otpSent) {
         const otpArray = inputRefs.current.map((block) => block.value);
         const otp = otpArray.join("");
-        const { data } = await resetPassword(otp, Password);
+        const { data } = await resetPassword(email, otp, newPassword);
         if (data.success) {
           toast.success(data.message);
-          navigate("/");
+          navigate("/login");
         } else toast.error(data.message);
       } else {
         const { data } = await getResetPasswordOtp(email);
         if (data.success) {
           toast.info(data.message);
           setOtpSent(true);
-        }else
-        {
-          toast.error(data.message)
+        } else {
+          toast.error(data.message);
         }
-        
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
-
-  useEffect(() => {
-    isLoggedIn && userData && userData.isAccountVerified && navigate("/");
-  }, [userData, isLoggedIn]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -88,7 +83,7 @@ function ResetPassword() {
                         type="text"
                         maxLength={1}
                         key={index}
-                        required
+                        required={otpSent}
                         className="w-12 aspect-square bg-amber-100 text-amber-900 text-center text-xl rounded-md"
                         ref={(e) => (inputRefs.current[index] = e)}
                         onInput={(e) => handleInput(e, index)}
@@ -120,6 +115,7 @@ function ResetPassword() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter New password"
                   className="outline-none"
+                  required={otpSent}
                 />
               </div>
             </div>
@@ -145,9 +141,10 @@ function ResetPassword() {
                 <input
                   name="email"
                   value={email}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   className="outline-none"
+                  required
                 />
               </div>
             </div>
