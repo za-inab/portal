@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import Password from "antd/es/input/Password";
+import axios from "axios";
+import { getResetPasswordOtp } from "../utilities/nextworkRequest";
 
 function ResetPassword() {
   const inputRefs = React.useRef([]);
@@ -43,6 +45,16 @@ function ResetPassword() {
           toast.success(data.message);
           navigate("/");
         } else toast.error(data.message);
+      } else {
+        const { data } = await getResetPasswordOtp(email);
+        if (data.success) {
+          toast.info(data.message);
+          setOtpSent(true);
+        }else
+        {
+          toast.error(data.message)
+        }
+        
       }
     } catch (error) {
       toast.error(error.message);
