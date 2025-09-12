@@ -30,7 +30,6 @@ export const AppContextProvider = (props) => {
       const { data } = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/api/user/data`
       );
-      console.log("data: ", data);
       if (data.success) setUserData(data.userData);
       else toast.error(data.error);
     } catch (error) {

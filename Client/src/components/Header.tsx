@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 
@@ -9,7 +9,14 @@ type HeaderProps = {
 export default function Header(props: HeaderProps) {
   const { name = "Developer" } = props;
 
-  const { userData } = useContext(AppContext);
+  const { userData, getAuthState } = useContext(AppContext);
+
+  useEffect(() => {
+    const getData = async () => {
+      await getAuthState();
+    };
+    getData();
+  }, []);
 
   return (
     <div className="flex flex-col items-center mt-20 px-4 text-center text-amber-900">
